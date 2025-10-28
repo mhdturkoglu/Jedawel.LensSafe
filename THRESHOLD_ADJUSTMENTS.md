@@ -42,8 +42,9 @@ These strict thresholds were missing actual eye rubbing events, especially:
 **Why:** Some genuine eye rubbing is gentle and slow:
 - Babies may rub eyes gently when tired
 - Slow circular rubbing motions are common
-- The original 0.01 threshold required ~6.4 pixels of movement per frame at 640px width
-- The new 0.004 threshold requires ~2.56 pixels of movement per frame
+- The original 0.01 threshold required approximately 6.4 pixels of movement per frame at 640px width (normalized coordinates × width)
+- The new 0.004 threshold requires approximately 2.56 pixels of movement per frame
+- Note: These are approximations as the actual pixel distances depend on MediaPipe's coordinate normalization
 
 **Impact:**
 - ✅ Detects gentle/slow rubbing motions (normalized motion >= 0.004)
@@ -115,7 +116,7 @@ Users can still fine-tune based on their environment:
 
 ## Summary
 These adjustments strike a better balance between sensitivity and stability:
-- **Reduced false negatives** by 60% (estimated based on threshold changes)
+- **Improved false negative detection** through more sensitive thresholds
 - **Maintained low false positives** through motion and depth checks
 - **Faster response** with 2-frame detection
 - **More natural** detection of actual rubbing behavior
