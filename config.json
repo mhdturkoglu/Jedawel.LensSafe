@@ -10,7 +10,9 @@
     "depth_threshold": 0.05,
     "min_detection_confidence": 0.5,
     "min_tracking_confidence": 0.5,
-    "consecutive_frames_threshold": 3
+    "consecutive_frames_threshold": 3,
+    "motion_threshold": 0.01,
+    "motion_history_frames": 5
   },
   "alert": {
     "sound_enabled": true,

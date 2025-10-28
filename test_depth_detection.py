@@ -57,13 +57,18 @@ class TestDepthDetection(unittest.TestCase):
         return hand_landmarks
     
     def test_hand_in_front_of_eye_close_proximity(self):
-        """Test: Hand in front of eye and close - should detect rubbing"""
+        """Test: Hand in front of eye and close with motion - should detect rubbing"""
         # Eye at depth 0.0, hand at depth -0.02 (in front)
         face_landmarks = self.create_mock_face_landmarks(eye_z_depth=0.0)
-        hand_landmarks = self.create_mock_hand_landmarks(x=0.3, y=0.3, z=-0.02)
         
-        result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
-        self.assertTrue(result, "Should detect eye rubbing when hand is in front and close")
+        # Simulate motion near the eye
+        positions = [(0.30, 0.30), (0.32, 0.31), (0.34, 0.30), (0.32, 0.29), (0.30, 0.30)]
+        result = False
+        for x, y in positions:
+            hand_landmarks = self.create_mock_hand_landmarks(x=x, y=y, z=-0.02)
+            result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
+        
+        self.assertTrue(result, "Should detect eye rubbing when hand is in front, close, and moving")
     
     def test_hand_behind_eye_close_proximity(self):
         """Test: Hand behind eye but close in 2D - should NOT detect rubbing"""
@@ -84,22 +89,32 @@ class TestDepthDetection(unittest.TestCase):
         self.assertFalse(result, "Should NOT detect eye rubbing when hand is far in 2D space")
     
     def test_hand_at_same_depth_as_eye(self):
-        """Test: Hand at same depth as eye and close - should detect rubbing"""
+        """Test: Hand at same depth as eye and close with motion - should detect rubbing"""
         # Eye at depth 0.0, hand at depth 0.0 (same level)
         face_landmarks = self.create_mock_face_landmarks(eye_z_depth=0.0)
-        hand_landmarks = self.create_mock_hand_landmarks(x=0.3, y=0.3, z=0.0)
         
-        result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
-        self.assertTrue(result, "Should detect eye rubbing when hand is at same depth and close")
+        # Simulate motion near the eye
+        positions = [(0.30, 0.30), (0.32, 0.31), (0.34, 0.30), (0.32, 0.29), (0.30, 0.30)]
+        result = False
+        for x, y in positions:
+            hand_landmarks = self.create_mock_hand_landmarks(x=x, y=y, z=0.0)
+            result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
+        
+        self.assertTrue(result, "Should detect eye rubbing when hand is at same depth, close, and moving")
     
     def test_hand_slightly_behind_within_threshold(self):
-        """Test: Hand slightly behind but within depth threshold - should detect rubbing"""
+        """Test: Hand slightly behind but within depth threshold with motion - should detect rubbing"""
         # Eye at depth 0.0, hand at depth 0.04 (slightly behind but within 0.05 threshold)
         face_landmarks = self.create_mock_face_landmarks(eye_z_depth=0.0)
-        hand_landmarks = self.create_mock_hand_landmarks(x=0.3, y=0.3, z=0.04)
         
-        result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
-        self.assertTrue(result, "Should detect eye rubbing when hand is within depth threshold")
+        # Simulate motion near the eye
+        positions = [(0.30, 0.30), (0.32, 0.31), (0.34, 0.30), (0.32, 0.29), (0.30, 0.30)]
+        result = False
+        for x, y in positions:
+            hand_landmarks = self.create_mock_hand_landmarks(x=x, y=y, z=0.04)
+            result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
+        
+        self.assertTrue(result, "Should detect eye rubbing when hand is within depth threshold and moving")
     
     def test_hand_behind_beyond_threshold(self):
         """Test: Hand behind and beyond depth threshold - should NOT detect rubbing"""
@@ -111,13 +126,18 @@ class TestDepthDetection(unittest.TestCase):
         self.assertFalse(result, "Should NOT detect eye rubbing when hand is beyond depth threshold")
     
     def test_right_eye_detection(self):
-        """Test: Detection works for right eye as well"""
+        """Test: Detection works for right eye as well with motion"""
         # Eye at depth 0.0, hand near right eye (x=0.7)
         face_landmarks = self.create_mock_face_landmarks(eye_z_depth=0.0)
-        hand_landmarks = self.create_mock_hand_landmarks(x=0.7, y=0.3, z=-0.02)
         
-        result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
-        self.assertTrue(result, "Should detect eye rubbing for right eye")
+        # Simulate motion near the right eye
+        positions = [(0.70, 0.30), (0.72, 0.31), (0.74, 0.30), (0.72, 0.29), (0.70, 0.30)]
+        result = False
+        for x, y in positions:
+            hand_landmarks = self.create_mock_hand_landmarks(x=x, y=y, z=-0.02)
+            result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
+        
+        self.assertTrue(result, "Should detect eye rubbing for right eye with motion")
     
     def test_no_face_landmarks(self):
         """Test: No detection when face landmarks are missing"""
@@ -144,22 +164,32 @@ class TestDepthDetection(unittest.TestCase):
         self.assertFalse(result, "Should NOT detect eye rubbing when hand is far in front of eye")
     
     def test_hand_very_close_depth_match(self):
-        """Test: Hand at exact same depth as eye and close in 2D - should detect rubbing"""
+        """Test: Hand at exact same depth as eye and close in 2D with motion - should detect rubbing"""
         # Eye at depth 0.0, hand at exact same depth (pressing on eye)
         face_landmarks = self.create_mock_face_landmarks(eye_z_depth=0.0)
-        hand_landmarks = self.create_mock_hand_landmarks(x=0.3, y=0.3, z=0.0)
         
-        result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
-        self.assertTrue(result, "Should detect eye rubbing when hand is at exact same depth")
+        # Simulate motion near the eye
+        positions = [(0.30, 0.30), (0.32, 0.31), (0.34, 0.30), (0.32, 0.29), (0.30, 0.30)]
+        result = False
+        for x, y in positions:
+            hand_landmarks = self.create_mock_hand_landmarks(x=x, y=y, z=0.0)
+            result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
+        
+        self.assertTrue(result, "Should detect eye rubbing when hand is at exact same depth and moving")
     
     def test_hand_just_within_depth_threshold(self):
-        """Test: Hand just within depth threshold - should detect rubbing"""
+        """Test: Hand just within depth threshold with motion - should detect rubbing"""
         # Eye at depth 0.0, hand at depth 0.049 (just within 0.05 threshold)
         face_landmarks = self.create_mock_face_landmarks(eye_z_depth=0.0)
-        hand_landmarks = self.create_mock_hand_landmarks(x=0.3, y=0.3, z=0.049)
         
-        result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
-        self.assertTrue(result, "Should detect eye rubbing when hand is just within depth threshold")
+        # Simulate motion near the eye
+        positions = [(0.30, 0.30), (0.32, 0.31), (0.34, 0.30), (0.32, 0.29), (0.30, 0.30)]
+        result = False
+        for x, y in positions:
+            hand_landmarks = self.create_mock_hand_landmarks(x=x, y=y, z=0.049)
+            result = self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
+        
+        self.assertTrue(result, "Should detect eye rubbing when hand is just within depth threshold and moving")
     
     def test_hand_just_outside_depth_threshold(self):
         """Test: Hand just outside depth threshold - should NOT detect rubbing"""

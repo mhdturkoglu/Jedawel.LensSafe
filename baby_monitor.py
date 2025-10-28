@@ -52,6 +52,10 @@ class BabyMonitor:
         self.consecutive_detections = 0
         self.alert_cooldown = self.config['alert']['alert_cooldown_seconds']
         
+        # Hand position history for motion tracking
+        self.hand_position_history = []
+        self.max_history_frames = self.config['detection'].get('motion_history_frames', 5)
+        
         # Initialize pygame for sound alerts
         if PYGAME_AVAILABLE and self.config['alert']['sound_enabled']:
             try:
@@ -89,7 +93,9 @@ class BabyMonitor:
                 "depth_threshold": 0.05,
                 "min_detection_confidence": 0.5,
                 "min_tracking_confidence": 0.5,
-                "consecutive_frames_threshold": 3
+                "consecutive_frames_threshold": 3,
+                "motion_threshold": 0.01,
+                "motion_history_frames": 5
             },
             "alert": {
                 "sound_enabled": False,
@@ -106,6 +112,37 @@ class BabyMonitor:
     def calculate_distance(self, point1, point2):
         """Calculate Euclidean distance between two points"""
         return np.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
+    
+    def calculate_hand_motion(self, current_position):
+        """Calculate hand motion/velocity based on position history
+        
+        Args:
+            current_position: Current hand position as [x, y] array
+            
+        Returns:
+            float: Average motion magnitude (velocity) over history frames
+        """
+        # Add current position to history
+        self.hand_position_history.append(current_position.copy())
+        
+        # Keep only the last N frames
+        if len(self.hand_position_history) > self.max_history_frames:
+            self.hand_position_history.pop(0)
+        
+        # Need at least 2 positions to calculate motion
+        if len(self.hand_position_history) < 2:
+            return 0.0
+        
+        # Calculate motion between consecutive frames
+        motions = []
+        for i in range(1, len(self.hand_position_history)):
+            prev_pos = self.hand_position_history[i - 1]
+            curr_pos = self.hand_position_history[i]
+            motion = self.calculate_distance(prev_pos, curr_pos)
+            motions.append(motion)
+        
+        # Return average motion magnitude
+        return np.mean(motions) if motions else 0.0
     
     def get_eye_regions(self, face_landmarks, image_width, image_height):
         """Extract eye region coordinates from face landmarks"""
@@ -140,8 +177,10 @@ class BabyMonitor:
         return left_eye_center, right_eye_center, left_eye_depth, right_eye_depth
     
     def detect_eye_rubbing(self, face_landmarks, hand_landmarks, image_width, image_height):
-        """Detect if hand is near eye region (potential eye rubbing)"""
+        """Detect if hand is rubbing eye region (requires both proximity AND motion)"""
         if face_landmarks is None or hand_landmarks is None:
+            # Clear hand position history if no hand is detected
+            self.hand_position_history = []
             return False
         
         # Get eye regions
@@ -178,7 +217,24 @@ class BabyMonitor:
         right_eye_close = (normalized_dist_right < threshold and 
                           right_depth_diff <= depth_threshold)
         
-        is_rubbing = left_eye_close or right_eye_close
+        is_near_eye = left_eye_close or right_eye_close
+        
+        # Calculate hand motion (velocity)
+        hand_motion = self.calculate_hand_motion(index_pos)
+        
+        # Normalize motion by image width for consistency
+        normalized_motion = hand_motion / image_width
+        
+        # Get motion threshold from config
+        motion_threshold = self.config['detection'].get('motion_threshold', 0.01)
+        
+        # Only detect rubbing if hand is near eye AND there's sufficient motion
+        # This prevents false positives when hand is just resting on face
+        is_rubbing = is_near_eye and (normalized_motion >= motion_threshold)
+        
+        # If hand is not near eye, clear the position history
+        if not is_near_eye:
+            self.hand_position_history = []
         
         return is_rubbing
     
