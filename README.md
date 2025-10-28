@@ -75,8 +75,11 @@ Edit `config.json` to customize the behavior:
 ## How It Works
 
 1. **Face Detection**: Uses MediaPipe to detect the baby's face in real-time
-2. **Hand Tracking**: Tracks hand positions and movements
-3. **Eye Rubbing Detection**: Analyzes hand proximity to eye region to detect rubbing gestures
+2. **Hand Tracking**: Tracks hand positions and movements in 3D space
+3. **Eye Rubbing Detection**: Analyzes hand proximity to eye region using both 2D distance and depth (Z-coordinate) to accurately detect rubbing gestures
+   - Checks if hand is close to eye in 2D space (X, Y coordinates)
+   - Verifies hand is in front of or at the same depth as the eye (Z coordinate)
+   - Prevents false positives when hand is behind the eye
 4. **Alert System**: Triggers audio/visual alerts when eye rubbing is detected
 5. **Cooldown Period**: Prevents alert spam with configurable cooldown
 
@@ -102,8 +105,20 @@ Edit `config.json` to customize the behavior:
 
 **Poor detection accuracy:**
 - Improve lighting conditions
-- Adjust detection thresholds in config.json
+- Adjust detection thresholds in config.json:
+  - `eye_rub_threshold`: Controls 2D proximity sensitivity (default: 0.15)
+  - `depth_threshold`: Controls Z-depth tolerance (default: 0.05)
 - Ensure camera has clear view of baby
+
+**False positives (detecting rubbing when it's not happening):**
+- Increase `eye_rub_threshold` to require hand to be closer to eye
+- Decrease `depth_threshold` to require hand to be more clearly in front of eye
+- Increase `consecutive_frames_threshold` to require more consistent detection
+
+**False negatives (not detecting actual rubbing):**
+- Decrease `eye_rub_threshold` to detect from farther distance
+- Increase `depth_threshold` to allow detection when hand is slightly behind
+- Decrease `consecutive_frames_threshold` for more sensitive detection
 
 **Alerts not working:**
 - Check sound settings and volume
