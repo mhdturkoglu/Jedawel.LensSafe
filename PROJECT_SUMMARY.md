@@ -8,7 +8,7 @@ Create an AI-powered application to monitor babies and alert caregivers when the
 ### Project Deliverables
 
 #### 1. Core Application (`baby_monitor.py`)
-- **450+ lines** of production-ready Python code
+- **400 lines** of production-ready Python code
 - Real-time video processing at 20-30 FPS
 - AI-powered face and hand detection using Google MediaPipe
 - Intelligent eye-rubbing detection algorithm
@@ -73,9 +73,9 @@ Python 3.8+ (Core Language)
 
 | Metric | Value |
 |--------|-------|
-| Total Files | 13 |
-| Lines of Code | 1,737 |
-| Core Application | 450+ lines |
+| Total Files | 14 |
+| Lines of Code | 2,047 |
+| Core Application | 400 lines |
 | Documentation | 5 guides |
 | Usage Examples | 5 scenarios |
 | Dependencies | 4 libraries |
@@ -117,7 +117,7 @@ Python 3.8+ (Core Language)
 
 ```
 Jedawel.LensSafe/
-├── 📄 baby_monitor.py         # Main application (450+ lines)
+├── 📄 baby_monitor.py         # Main application (400 lines)
 ├── ⚙️ config.json             # Configuration file
 ├── 📦 requirements.txt        # Dependencies
 ├── 🧪 test_setup.py          # System verification
