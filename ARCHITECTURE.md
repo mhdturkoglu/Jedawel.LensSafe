@@ -123,29 +123,41 @@ Jedawel LensSafe is an AI-powered baby monitoring system designed to detect when
 
 ### 4. Eye Rubbing Detection Algorithm
 
-**Method**: Distance-based proximity detection
+**Method**: 3D proximity detection using 2D distance and depth analysis
 
 **Algorithm**:
 ```python
-1. Get eye center coordinates (left_eye_center, right_eye_center)
-2. Get hand fingertip position (index_finger_tip)
-3. Calculate Euclidean distance: 
+1. Get eye center coordinates (left_eye_center, right_eye_center) and depth (z-coordinate)
+2. Get hand fingertip position (index_finger_tip) including depth
+3. Calculate 2D Euclidean distance: 
    d = sqrt((x1-x2)² + (y1-y2)²)
-4. Normalize by image width for scale independence
-5. If normalized_distance < threshold:
+4. Normalize 2D distance by image width for scale independence
+5. Calculate depth difference:
+   depth_diff = abs(hand_z - eye_z)
+6. If (normalized_distance < eye_rub_threshold) AND (depth_diff <= depth_threshold):
    → Eye rubbing detected
 ```
 
 **Thresholds**:
-- Default: 0.15 (15% of image width)
-- Adjustable in config.json
-- Lower = more sensitive
-- Higher = less sensitive
+- **eye_rub_threshold**: Default 0.15 (15% of image width)
+  - Controls 2D proximity sensitivity
+  - Lower = more sensitive to 2D distance
+  - Higher = requires hand closer to eye in 2D space
+- **depth_threshold**: Default 0.05
+  - Controls Z-depth tolerance (how close hand must be to eye depth)
+  - Lower = requires hand more precisely at eye depth (stricter pressing detection)
+  - Higher = allows more depth variation (more lenient)
+  - Uses absolute difference to check if hand is within depth range of the eye
+
+**Depth Detection Benefits**:
+- Prevents false positives when hand waves in front of face (hand far from eye in Z-axis)
+- Requires hand to be pressing on or very close to the eye (not just anywhere in front)
+- More accurate detection of actual eye rubbing behavior
 
 **False Positive Reduction**:
 - Consecutive frame requirement (default: 3 frames)
 - Prevents single-frame detection errors
-- Ensures sustained hand-to-eye proximity
+- Ensures sustained hand-to-eye proximity in both 2D and depth
 
 ### 5. Alert System
 

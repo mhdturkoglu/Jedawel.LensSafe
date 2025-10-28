@@ -166,13 +166,17 @@ class BabyMonitor:
         threshold = self.config['detection']['eye_rub_threshold']
         depth_threshold = self.config['detection'].get('depth_threshold', 0.05)
         
-        # Check left eye: hand must be close in 2D AND in front of (or very close in depth to) the eye
+        # Check left eye: hand must be close in 2D AND at approximately the same depth (pressing on eye)
+        # The hand should be within a small depth range around the eye, not just in front
+        left_depth_diff = abs(index_depth - left_eye_depth)
         left_eye_close = (normalized_dist_left < threshold and 
-                         index_depth <= left_eye_depth + depth_threshold)
+                         left_depth_diff <= depth_threshold)
         
-        # Check right eye: hand must be close in 2D AND in front of (or very close in depth to) the eye
+        # Check right eye: hand must be close in 2D AND at approximately the same depth (pressing on eye)
+        # The hand should be within a small depth range around the eye, not just in front
+        right_depth_diff = abs(index_depth - right_eye_depth)
         right_eye_close = (normalized_dist_right < threshold and 
-                          index_depth <= right_eye_depth + depth_threshold)
+                          right_depth_diff <= depth_threshold)
         
         is_rubbing = left_eye_close or right_eye_close
         
