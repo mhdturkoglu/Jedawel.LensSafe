@@ -94,7 +94,7 @@ class BabyMonitor:
                 "min_detection_confidence": 0.5,
                 "min_tracking_confidence": 0.5,
                 "consecutive_frames_threshold": 2,
-                "motion_threshold": 0.005,
+                "motion_threshold": 0.004,
                 "motion_history_frames": 5
             },
             "alert": {

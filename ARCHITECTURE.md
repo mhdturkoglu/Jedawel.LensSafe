@@ -148,7 +148,7 @@ Jedawel LensSafe is an AI-powered baby monitoring system designed to detect when
   - Lower = requires hand more precisely at eye depth (stricter pressing detection)
   - Higher = allows more depth variation (more lenient)
   - Uses absolute difference to check if hand is within depth range of the eye
-- **motion_threshold**: Default 0.005
+- **motion_threshold**: Default 0.004
   - Controls motion sensitivity (how much hand movement is required)
   - Lower = detects slower/gentler rubbing motions
   - Higher = requires faster hand movement
