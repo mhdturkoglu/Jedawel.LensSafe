@@ -86,6 +86,7 @@ class BabyMonitor:
             "camera": {"source": 0, "width": 640, "height": 480, "fps": 30},
             "detection": {
                 "eye_rub_threshold": 0.15,
+                "depth_threshold": 0.05,
                 "min_detection_confidence": 0.5,
                 "min_tracking_confidence": 0.5,
                 "consecutive_frames_threshold": 3
@@ -115,20 +116,28 @@ class BabyMonitor:
         
         left_eye_points = []
         right_eye_points = []
+        left_eye_depths = []
+        right_eye_depths = []
         
         for idx in left_eye_indices:
             landmark = face_landmarks.landmark[idx]
             left_eye_points.append([landmark.x * image_width, landmark.y * image_height])
+            left_eye_depths.append(landmark.z)
         
         for idx in right_eye_indices:
             landmark = face_landmarks.landmark[idx]
             right_eye_points.append([landmark.x * image_width, landmark.y * image_height])
+            right_eye_depths.append(landmark.z)
         
         # Calculate centers
         left_eye_center = np.mean(left_eye_points, axis=0)
         right_eye_center = np.mean(right_eye_points, axis=0)
         
-        return left_eye_center, right_eye_center
+        # Calculate average depth
+        left_eye_depth = np.mean(left_eye_depths)
+        right_eye_depth = np.mean(right_eye_depths)
+        
+        return left_eye_center, right_eye_center, left_eye_depth, right_eye_depth
     
     def detect_eye_rubbing(self, face_landmarks, hand_landmarks, image_width, image_height):
         """Detect if hand is near eye region (potential eye rubbing)"""
@@ -136,13 +145,14 @@ class BabyMonitor:
             return False
         
         # Get eye regions
-        left_eye_center, right_eye_center = self.get_eye_regions(
+        left_eye_center, right_eye_center, left_eye_depth, right_eye_depth = self.get_eye_regions(
             face_landmarks, image_width, image_height
         )
         
         # Get hand fingertip positions (index finger tip and thumb tip)
         index_finger_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
         index_pos = np.array([index_finger_tip.x * image_width, index_finger_tip.y * image_height])
+        index_depth = index_finger_tip.z
         
         # Calculate distances to eyes
         dist_to_left_eye = self.calculate_distance(index_pos, left_eye_center)
@@ -154,7 +164,17 @@ class BabyMonitor:
         
         # Check if hand is close to either eye
         threshold = self.config['detection']['eye_rub_threshold']
-        is_rubbing = normalized_dist_left < threshold or normalized_dist_right < threshold
+        depth_threshold = self.config['detection'].get('depth_threshold', 0.05)
+        
+        # Check left eye: hand must be close in 2D AND in front of (or very close in depth to) the eye
+        left_eye_close = (normalized_dist_left < threshold and 
+                         index_depth <= left_eye_depth + depth_threshold)
+        
+        # Check right eye: hand must be close in 2D AND in front of (or very close in depth to) the eye
+        right_eye_close = (normalized_dist_right < threshold and 
+                          index_depth <= right_eye_depth + depth_threshold)
+        
+        is_rubbing = left_eye_close or right_eye_close
         
         return is_rubbing
     
@@ -266,7 +286,7 @@ class BabyMonitor:
         if face_results.multi_face_landmarks:
             for face_landmarks in face_results.multi_face_landmarks:
                 # Draw eye regions
-                left_eye_center, right_eye_center = self.get_eye_regions(
+                left_eye_center, right_eye_center, _, _ = self.get_eye_regions(
                     face_landmarks, width, height
                 )
                 cv2.circle(frame, tuple(left_eye_center.astype(int)), 5, (0, 255, 255), -1)
