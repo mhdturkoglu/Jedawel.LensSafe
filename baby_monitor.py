@@ -122,8 +122,8 @@ class BabyMonitor:
         Returns:
             float: Average motion magnitude (velocity) over history frames
         """
-        # Add current position to history
-        self.hand_position_history.append(current_position.copy())
+        # Add current position to history (store as list to avoid numpy overhead)
+        self.hand_position_history.append([current_position[0], current_position[1]])
         
         # Keep only the last N frames
         if len(self.hand_position_history) > self.max_history_frames:

@@ -51,7 +51,7 @@ class TestMotionDetection(unittest.TestCase):
         hand_landmarks.landmark = {}
         
         # Create index finger tip landmark
-        from baby_monitor import mp
+        import mediapipe as mp
         index_finger_tip_idx = mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP
         hand_landmarks.landmark[index_finger_tip_idx] = self.create_mock_landmark(x, y, z)
         
@@ -262,8 +262,10 @@ class TestMotionDetection(unittest.TestCase):
         self.monitor.detect_eye_rubbing(face_landmarks, hand_landmarks, 640, 480)
         
         # History should be cleared
-        self.assertEqual(len(self.monitor.hand_position_history), 0, 
-                        "History should be cleared when hand leaves eye region")
+        self.assertEqual(
+            len(self.monitor.hand_position_history), 0, 
+            "History should be cleared when hand leaves eye region"
+        )
     
     def test_history_cleared_when_no_hand_detected(self):
         """Test: Position history should be cleared when hand is not detected"""
@@ -281,8 +283,10 @@ class TestMotionDetection(unittest.TestCase):
         self.monitor.detect_eye_rubbing(face_landmarks, None, 640, 480)
         
         # History should be cleared
-        self.assertEqual(len(self.monitor.hand_position_history), 0,
-                        "History should be cleared when hand is not detected")
+        self.assertEqual(
+            len(self.monitor.hand_position_history), 0,
+            "History should be cleared when hand is not detected"
+        )
 
 
 if __name__ == '__main__':
