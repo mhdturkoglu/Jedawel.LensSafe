@@ -1,0 +1,25 @@
+{
+  "camera": {
+    "source": 0,
+    "width": 640,
+    "height": 480,
+    "fps": 30
+  },
+  "detection": {
+    "eye_rub_threshold": 0.15,
+    "min_detection_confidence": 0.5,
+    "min_tracking_confidence": 0.5,
+    "consecutive_frames_threshold": 3
+  },
+  "alert": {
+    "sound_enabled": true,
+    "sound_file": "alert.wav",
+    "alert_cooldown_seconds": 5,
+    "visual_alert_enabled": true
+  },
+  "display": {
+    "show_video": true,
+    "show_fps": true,
+    "window_name": "Jedawel LensSafe - Baby Monitor"
+  }
+}
