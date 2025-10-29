@@ -143,21 +143,35 @@ Jedawel LensSafe is an AI-powered baby monitoring system designed to detect when
   - Controls 2D proximity sensitivity
   - Lower = more sensitive to 2D distance
   - Higher = requires hand closer to eye in 2D space
-- **depth_threshold**: Default 0.05
+- **depth_threshold**: Default 0.08
   - Controls Z-depth tolerance (how close hand must be to eye depth)
   - Lower = requires hand more precisely at eye depth (stricter pressing detection)
   - Higher = allows more depth variation (more lenient)
   - Uses absolute difference to check if hand is within depth range of the eye
+- **motion_threshold**: Default 0.004
+  - Controls motion sensitivity (how much hand movement is required)
+  - Lower = detects slower/gentler rubbing motions
+  - Higher = requires faster hand movement
+- **consecutive_frames_threshold**: Default 2
+  - Number of consecutive frames required for detection
+  - Lower = more responsive but may increase false positives
+  - Higher = more stable but may miss brief rubbing events
 
 **Depth Detection Benefits**:
 - Prevents false positives when hand waves in front of face (hand far from eye in Z-axis)
 - Requires hand to be pressing on or very close to the eye (not just anywhere in front)
 - More accurate detection of actual eye rubbing behavior
 
+**Motion Detection Benefits**:
+- Prevents false positives when hand is just resting on face (no movement)
+- Requires active rubbing motion, not just proximity
+- Reduces alerts from static hand positions
+
 **False Positive Reduction**:
-- Consecutive frame requirement (default: 3 frames)
+- Consecutive frame requirement (default: 2 frames)
 - Prevents single-frame detection errors
 - Ensures sustained hand-to-eye proximity in both 2D and depth
+- Motion tracking ensures active rubbing, not static hand placement
 
 ### 5. Alert System
 

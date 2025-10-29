@@ -90,11 +90,11 @@ class BabyMonitor:
             "camera": {"source": 0, "width": 640, "height": 480, "fps": 30},
             "detection": {
                 "eye_rub_threshold": 0.15,
-                "depth_threshold": 0.05,
+                "depth_threshold": 0.08,
                 "min_detection_confidence": 0.5,
                 "min_tracking_confidence": 0.5,
-                "consecutive_frames_threshold": 3,
-                "motion_threshold": 0.01,
+                "consecutive_frames_threshold": 2,
+                "motion_threshold": 0.004,
                 "motion_history_frames": 5
             },
             "alert": {

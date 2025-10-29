@@ -108,9 +108,10 @@ Edit `config.json` to customize the behavior:
 - Improve lighting conditions
 - Adjust detection thresholds in config.json:
   - `eye_rub_threshold`: Controls 2D proximity sensitivity (default: 0.15)
-  - `depth_threshold`: Controls Z-depth tolerance - hand must be within this depth range of the eye (default: 0.05)
-  - `motion_threshold`: Controls motion sensitivity - hand must move at least this much to trigger detection (default: 0.01)
+  - `depth_threshold`: Controls Z-depth tolerance - hand must be within this depth range of the eye (default: 0.08)
+  - `motion_threshold`: Controls motion sensitivity - hand must move at least this much to trigger detection (default: 0.004)
   - `motion_history_frames`: Number of frames to track for motion calculation (default: 5)
+  - `consecutive_frames_threshold`: Number of consecutive frames required for detection (default: 2)
 - Ensure camera has clear view of baby
 
 **False positives (detecting rubbing when it's not happening):**
